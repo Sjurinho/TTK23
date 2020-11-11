@@ -26,7 +26,7 @@ def show_policy(env, Q):
 def Q_Learning(env, gamma, Q, alpha, epsilon):
     # Reset environment
     s, r, done = env.reset()
-
+    print(s)
     """
     YOUR CODE HERE:
     Problem 1a) Implement Q-Learning
@@ -44,8 +44,11 @@ def Q_Learning(env, gamma, Q, alpha, epsilon):
     """
     
     while(not done):
-        raise Exception("Problem 1a) not implemented")
-
+        a = np.argmax(Q[s]) if np.random.rand(1) <= epsilon else np.random.randint(0, high=Q.shape[1])
+        action=env.actions(s)[a]
+        s_next, r, done = env.step(action)
+        Q[s, a] += alpha*(r + gamma*max(Q[s_next]) - Q[s,a])
+        s = s_next
     return Q
 
 ####################  Problem 2: SARSA #################### 
@@ -68,13 +71,60 @@ def SARSA(env, gamma, Q, alpha, epsilon):
         - s_next, r, done = env.step(a)  Take action a and observe the next state, reward and environment termination
         - actions = env.actions()        List available actions in current state (is empty if state is terminal)
     """
-    
+    a = np.argmax(Q[s]) if np.random.random_sample() <= epsilon else np.random.randint(low=0, high=Q.shape[1])
+
     while(not done):
-        raise Exception("Problem 2a) not implemented")
+        #raise Exception("Problem 2a) not implemented")
+        action = env.actions()[a]
+        s_next, r, done = env.step(action)
+        a_next = np.argmax(Q[s_next]) if np.random.random_sample() <= epsilon else np.random.randint(low=0, high=Q.shape[1])
+        Q[s, a] += alpha*(r + gamma*Q[s_next, a_next] - Q[s, a])
+        s = s_next
+        a = a_next
 
     return Q
 
 
+def convert_state_to_indices(s, n_theta, n_theta_dot):
+    for i in range(1, n_theta + 1):
+        if s[0] <= -np.pi + i * (2 * np.pi) / n_theta:
+            s1 = i - 1
+            break
+
+    for i in range(1, n_theta_dot + 1):
+        if s[1] <= -10 + i * 20 / n_theta_dot:
+            s2 = i - 1
+            break
+
+    return s1, s2
+
+def Q_Learning_pendulum(env, gamma, Q, alpha, epsilon, n_theta, n_theta_dot):
+    # Reset environment
+    s, r, done = env.reset()
+    """
+    YOUR CODE HERE:
+    Problem 1a) Implement Q-Learning
+    
+    Input arguments:
+        - env     Is the environment
+        - gamma   Is the discount rate
+        - Q       Is the Q table
+        - alpha   Is the learning rate
+        - epsilon Is the probability of choosing greedy action
+    
+    Some usefull functions of the grid world environment
+        - s_next, r, done = env.step(a)  Take action a and observe the next state, reward and environment termination
+        - actions = env.actions()        List available actions in current state (is empty if state is terminal)
+    """
+    s1, s2 = convert_state_to_indices(s, n_theta, n_theta_dot)
+    while(not done):
+        a = np.argmax(Q[s1, s2]) if np.random.rand(1) <= epsilon else np.random.randint(0, high=Q.shape[2])
+        action=env.actions(s)[a]
+        s_next, r, done = env.step(action)
+        s1_next, s2_next = convert_state_to_indices(s_next, n_theta, n_theta_dot)
+        Q[s1, s2, a] += alpha*(r + gamma*max(Q[s1_next, s2_next]) - Q[s1, s2,a])
+        s1, s2 = s1_next, s2_next
+    return Q
 if __name__ == "__main__":
     """
     Note that this code has been written for python 3.x, and requiers the numpy, matplotlib
@@ -152,12 +202,19 @@ if __name__ == "__main__":
     epsilon = 0.5   # Probability of taking greedy action
     episodes = 5000 # Number of episodes
 
+    n_theta = 10       # number of discretized states for theta state
+    n_theta_dot = 10    # number of discretized states for theta_dot state
 
-    raise Exception("Problem 3a) Choose your Q-Table to fit discretization")
-    #Q = np.zeros([?, ?, 3])
-    
+    #raise Exception("Problem 3a) Choose your Q-Table to fit discretization")
+    Q = np.zeros([n_theta, n_theta_dot, 3])
+    QLearning = True
     for i in range(episodes):
-        raise Exception("Problem 3a) Choose either Q-Learning or SARSA, and modify it to work with the pendulum environment")
+        print(f'episode: {i}')
+        #raise Exception("Problem 3a) Choose either Q-Learning or SARSA, and modify it to work with the pendulum environment")
+        if Q_Learning:
+            Q_Learning_pendulum(env, gamma, Q, alpha, epsilon, n_theta, n_theta_dot)
+        else:
+            SARSA(env, gamma, Q, alpha, epsilon)
 
 
     # Plot the value function
@@ -175,8 +232,7 @@ if __name__ == "__main__":
     fig = env.render()
     s, _, _ = env.reset([np.pi, 0])
     for i in range(200):
-        raise Exception("Problem 3a) Change code below to use you discretization. If you do, you should get a cool animation")
-        #s = ? 
-        #a = np.argmax(Q[?, ?, :])
+        s1, s2 = convert_state_to_indices(s, n_theta, n_theta_dot)
+        a = np.argmax(Q[s1][s2][:])
         s, _, _ = env.step(a)
         plt.pause(env.step_size)
