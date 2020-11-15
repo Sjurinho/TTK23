@@ -1,0 +1,39 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+%\usepackage{kyblab}
+\usepackage{csquotes} % Needs to be loaded after inputenc.
+\usepackage{titling}
+\usepackage{parskip}
+
+\usepackage{hyperref} % Provides clickable links. Always load last, but before cleveref.
+\usepackage[
+  backend=bibtex,
+  style=numeric,
+  isbn=false,
+  doi=false]{biblatex}
+\addbibresource{bibliography.bib}
+
+\setlength{\droptitle}{-13em}   % This is your set screw
+% Parskip settings
+\setlength{\parindent}{15pt}
+
+\author{Sjur Grønnevik Wroldsen\\sjurgw@stud.ntnu.no}
+\title{From an industrial perspective, what level of autonomy is optimal for society?}
+\begin{document}
+  \maketitle
+  The success of a company is often measured by its value. Value comes in the form of economic profit or intangible values such as intellectual capital or reputation. Economic profit is defined through the simple formula 
+  \begin{equation}
+    profit = revenue - costs
+  \end{equation}
+  and can be increased by either increasing revenue or decreasing the cost. For a large company the cost is often associated with a large quanta of workers, while revenue typically is increased by developing more effective working methods.
+  
+  The industrial revolutions has lead to most industries raising their level of autonomy(LOA) to a point where human-machine interaction plays a large role. According to \cite{wageGapVsAutomation} development of new technology has since 1987 benefitted \enquote{high-skilled} workers. With the new technology simpler tasks could be automated which deemed the \enquote{low-skilled} workers less valuable. \cite{wageGapVsAutomation} argues that this has contributed to the increased income gap that we see, especially in countries dominated by the private market, such as USA. 
+  Although the report focuses mainly transition between the low LOA, it does however raise an important question for further increasing the LOA of the industry; who are the \enquote{winners} and \enquote{losers} with the increased commitment to autonomy?
+  
+  When discussing the LOA in an industry it is important to consider its aspects in different dimensions. The paragraph above mainly discusses the increasing automation, where raising the LOA seems to exclude the inclusion of human operators. This is, however, not necessarily the case. Autonomy concerns several dimensions, where automation merely is one of them. For industrial applications, autonomy can also be considered for the sake of risk management and deliberation. Clearly it is beneficial to avoid jeopordazing human operators as a result of a system failure. Also, it might be highly beneficial to the human operators if the system could integrate data from different sources and deliberate this to them as an aid to operation and/or supervision. As there often is alot of data associated that could be of interest for an operation, the latter might be especially crucial for safety, for example for pilots where flying conditions are important to consider. 
+  
+  To conclude, increasing autonomy on an industrial level affects the society in different ways. Raising the LOA of an industry involves increased automation, risk management and/or deliberation of data. Increasing automation seems to increase the wage gap in a society, which according to \cite{consequenceOfInequality} has alot of negative effects within economics, politics and social consequences like increased crime and worse school performances. However, an increase in the other dimensions of autonomy, such as increased autonomy in risk management and deliberation seems to have positive consequences as it makes human-machine interaction easier and more robust. Based on these factors, a preferred level of autonomy for the society seems to increase in the dimensions of data deliberation and risk management, whilst still including human operators in the automation dimension. Evolving too far in the automation dimension seems to marginalize out the humans from the industry, effectively giving the asset owners all the goods that come from the industry.
+
+  \printbibliography
+
+\end{document}
