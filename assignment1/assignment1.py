@@ -8,7 +8,7 @@ def show_value_function(mdp, V):
     for k in mdp.states():
         s = k if isinstance(k, tuple) else mdp.legal_states[k]
         fig.axes[0].annotate("{0:.3f}".format(V[k]), (s[1] - 0.1, s[0] + 0.1), size = 40/mdp.board_mask.shape[0])
-    plt.show()
+    plt.show(block=False)
     
 def show_policy(mdp, PI):
     fig = mdp.render(show_state = False, show_reward = False)
@@ -17,7 +17,7 @@ def show_policy(mdp, PI):
         s = k if isinstance(k, tuple) else mdp.legal_states[k]
         if mdp.terminal[s] == 0:
             fig.axes[0].annotate(action_map[PI[k]], (s[1] - 0.1, s[0] + 0.1), size = 100/mdp.board_mask.shape[0])
-    plt.show()
+    plt.show(block=False)
 
 ####################  Problem 1: Value Iteration #################### 
 def sum_of_states(mdp, V, state, action):
@@ -25,7 +25,7 @@ def sum_of_states(mdp, V, state, action):
 def value_iteration(mdp, gamma, theta = 1e-3):
     # Make a valuefunction, initialized to 0
     V = np.zeros((len(mdp.states())))
-    
+    its = 0
     """
     YOUR CODE HERE:
     Problem 1a) Implement Value Iteration
@@ -41,9 +41,12 @@ def value_iteration(mdp, gamma, theta = 1e-3):
         - mdp.transition_probability(s, a, s_next) returns the probability p(s_next | s, a)
         - mdp.reward(state) returns the reward of the state R(s)
     """
+    max_deltV = 0
+    V_old = np.zeros((len(mdp.states())))
     #raise Exception("Not implemented")
     while True:
         delta = 0
+        V_old = deepcopy(V)
         for s in mdp.states():
             v = V[s]
             if len(mdp.actions(s))==0:
@@ -51,10 +54,12 @@ def value_iteration(mdp, gamma, theta = 1e-3):
             else: 
                 V[s] = np.max([np.sum([mdp.transition_probability(s, a, s_next)*(mdp.reward(s) + gamma*V[s_next]) for s_next in mdp.states()]) for a in mdp.actions(s)])
             delta = max(delta, abs(v - V[s]))
-        
+        if max_deltV < np.linalg.norm(V-V_old, np.inf):
+            max_deltV = np.linalg.norm(V-V_old, np.inf)
         if delta < theta:
             break
-    return V
+        its += 1
+    return V, max_deltV, its
 
 def policy(mdp, V):
     # Initialize the policy list of crrect length
@@ -151,7 +156,7 @@ def policy_iteration(mdp, gamma):
     
     # Create an arbitrary policy PI
     PI = np.random.choice(env.actions(), len(mdp.states()))
-    
+    its = 0
     """
     YOUR CODE HERE:
     Problem 2b) Implement Policy Iteration
@@ -164,8 +169,11 @@ def policy_iteration(mdp, gamma):
         - Use the the policy_evaluation function from the preveous subproblem
     """
     #raise Exception("Not implemented")
+    max_deltV = 0
+    V_OLD = np.zeros((len(mdp.states())))
     while True:
         PI_old = deepcopy(PI)
+        V_OLD = deepcopy(V)
         V = policy_evaluation(mdp, gamma, PI, V)
         for i in range(len(mdp.states())):
             s = mdp.states()[i]
@@ -176,8 +184,10 @@ def policy_iteration(mdp, gamma):
                 PI[i] = mdp.actions(s)[best_policy_idx]
         if np.array_equal(PI, PI_old):
             break
-        
-    return PI, V
+        if max_deltV < np.linalg.norm(V-V_OLD, np.inf):
+            max_deltV = np.linalg.norm(V-V_OLD, np.inf)
+        its += 1
+    return PI, V, max_deltV, its
 
 if __name__ == "__main__":
     """
@@ -190,7 +200,7 @@ if __name__ == "__main__":
         - gridworlds/tiny.json
         - gridworlds/large.json
     """
-    gamma   = 0.99
+    gamma   = 1
     filname = "gridworlds/tiny.json"
 
 
@@ -202,13 +212,17 @@ if __name__ == "__main__":
     plt.show()
     
     # Run Value Iteration and render value function and policy
-    V = value_iteration(mdp = env, gamma = gamma)
+    V, max_deltv, its = value_iteration(mdp = env, gamma = gamma)
+    print(f'Value iteration:\nmax_deltV: {max_deltv}, its: {its}')
     show_value_function(env, V)
     
     PI = policy(env, V)
     show_policy(env, PI)
     
     # Run Policy Iteration and render value function and policy
-    PI, V = policy_iteration(mdp = env, gamma = gamma)
+    PI, V, max_deltv, its = policy_iteration(mdp = env, gamma = gamma)
+    print(f'Policy iteration:\nmax_deltV: {max_deltv}, its: {its}')
+
     show_value_function(env, V)
     show_policy(env, PI)
+    plt.show()

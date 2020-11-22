@@ -10,7 +10,7 @@ def show_action_value_function(env, Q):
         s = env.legal_states[k]
         for i, a in enumerate(env.actions(k)):
             fig.axes[0].annotate("{0:.2f}".format(Q[k, i]), (s[1] + pos[a][0], s[0] + pos[a][1]), size = 40/env.board_mask.shape[0], color = "r" if Q[k, i] == max(Q[k, :]) else "k")
-    plt.show()
+    plt.show(block=False)
     
 def show_policy(env, Q):
     fig = env.render(show_state = False, show_reward = False)
@@ -19,14 +19,13 @@ def show_policy(env, Q):
         s = k if isinstance(k, tuple) else env.legal_states[k]
         if not env.terminal(s):
             fig.axes[0].annotate(action_map[env.actions(s)[np.argmax(Q[k, :])]], (s[1] - 0.1, s[0] + 0.1), size = 100/env.board_mask.shape[0])
-    plt.show()
+    plt.show(block=False)
 
 
 ####################  Problem 1: Q-Learning #################### 
 def Q_Learning(env, gamma, Q, alpha, epsilon):
     # Reset environment
     s, r, done = env.reset()
-    print(s)
     """
     YOUR CODE HERE:
     Problem 1a) Implement Q-Learning
@@ -147,7 +146,7 @@ if __name__ == "__main__":
     """
     gamma = 1.0     # Discount rate
     alpha = 0.1     # Learning rate
-    epsilon = 0.9   # Probability of taking greedy action
+    epsilon = 0.5   # Probability of taking greedy action
     episodes = 5000 # Number of episodes
 
     Q = np.zeros([len(env.states()), 4])
@@ -166,7 +165,7 @@ if __name__ == "__main__":
     """
     gamma = 1.0     # Discount rate
     alpha = 0.1     # Learning rate
-    epsilon = 0.9   # Probability of taking greedy action
+    epsilon = 0.5   # Probability of taking greedy action
     episodes = 5000 # Number of episodes
 
     Q = np.zeros([len(env.states()), 4])
@@ -176,7 +175,7 @@ if __name__ == "__main__":
     # Render Q-values and policy 
     show_action_value_function(env, Q)
     show_policy(env, Q)
-
+    plt.show()
 
     """
     Problem 3) Pendulum 
@@ -192,7 +191,7 @@ if __name__ == "__main__":
             Q-table is able to store this. The simplest way ofdoing this is to create a three dimensional Q-Table in 
             the following way:  Q[theta, theta_dot, action]
     """
-
+    """
     # Create instance of pendulum environment
     env = pendulum()
     fig = env.render()
@@ -236,3 +235,4 @@ if __name__ == "__main__":
         a = np.argmax(Q[s1][s2][:])
         s, _, _ = env.step(a)
         plt.pause(env.step_size)
+    """
